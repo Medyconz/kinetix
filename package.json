@@ -1,0 +1,14 @@
+{
+  "name": "kinetix",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Kinetix website and Cloudflare Worker backend.",
+  "scripts": {
+    "check": "node --check script.js && node --check worker.js",
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev"
+  },
+  "devDependencies": {
+    "wrangler": "^4.0.0"
+  }
+}
