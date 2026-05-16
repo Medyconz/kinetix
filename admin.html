@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin | Kinetix</title>
+  <meta name="description" content="Kinetix admin dashboard for activities, registrations, products, and product images.">
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+<body data-page="admin">
+  <header class="site-header">
+    <nav class="navbar" aria-label="Main navigation">
+      <a class="brand" href="index.html" aria-label="Kinetix home">
+        <img src="assets/kinetix-logo.svg" alt="" class="brand-mark">
+        <span>KINETIX</span>
+      </a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">
+        <span class="sr-only">Toggle navigation</span>
+        <span></span>
+        <span></span>
+      </button>
+      <div class="nav-links" id="site-nav">
+        <a href="index.html" data-nav="home">Home</a>
+        <a href="coaching.html" data-nav="coaching">Coaching</a>
+        <a href="activities.html" data-nav="activities">Activities</a>
+        <a href="merch.html" data-nav="merch">Merch</a>
+        <a href="about.html" data-nav="about">About / Contact</a>
+        <a href="admin.html" data-nav="admin">Admin</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="page-hero admin-hero">
+      <p class="eyebrow">Admin</p>
+      <h1>Control the Kinetix backend.</h1>
+      <p>Manage activities, registrations, product listings, and product images from one private dashboard.</p>
+    </section>
+
+    <section class="section admin-section">
+      <form class="form-panel admin-login js-admin-login" aria-labelledby="admin-login-title">
+        <h2 id="admin-login-title">Admin login</h2>
+        <label for="admin-password">Password</label>
+        <input id="admin-password" name="password" type="password" autocomplete="current-password" required>
+        <button class="button button-primary" type="submit">Enter Dashboard</button>
+        <p class="form-status" role="status" aria-live="polite"></p>
+      </form>
+
+      <div class="admin-dashboard is-hidden" aria-live="polite">
+        <div class="admin-topline">
+          <div>
+            <p class="eyebrow">Dashboard</p>
+            <h2>Content and registrations</h2>
+          </div>
+          <button class="button button-secondary js-admin-logout" type="button">Logout</button>
+        </div>
+
+        <div class="stat-grid">
+          <div><span data-stat="activities">0</span><p>Activities</p></div>
+          <div><span data-stat="products">0</span><p>Products</p></div>
+          <div><span data-stat="registrations">0</span><p>Registrations</p></div>
+          <div><span data-stat="bookings">0</span><p>Bookings</p></div>
+        </div>
+
+        <div class="admin-tabs" role="tablist" aria-label="Admin sections">
+          <button class="is-active" type="button" data-admin-tab="activities">Activities</button>
+          <button type="button" data-admin-tab="registrations">Registrations</button>
+          <button type="button" data-admin-tab="products">Products</button>
+          <button type="button" data-admin-tab="bookings">Bookings</button>
+        </div>
+
+        <section class="admin-pane is-active" data-admin-pane="activities">
+          <div class="admin-grid">
+            <form class="form-panel js-activity-admin-form" aria-labelledby="activity-admin-title">
+              <h3 id="activity-admin-title">Add or edit activity</h3>
+              <input type="hidden" name="id">
+              <label for="admin-activity-title">Title</label>
+              <input id="admin-activity-title" name="title" type="text" required>
+              <label for="admin-activity-date">Date</label>
+              <input id="admin-activity-date" name="date" type="date" required>
+              <label for="admin-activity-time">Time</label>
+              <input id="admin-activity-time" name="time" type="text" placeholder="6:00 PM" required>
+              <label for="admin-activity-location">Location</label>
+              <input id="admin-activity-location" name="location" type="text" required>
+              <label for="admin-activity-age">Age group</label>
+              <input id="admin-activity-age" name="ageGroup" type="text" required>
+              <label for="admin-activity-description">Description</label>
+              <textarea id="admin-activity-description" name="description" rows="4"></textarea>
+              <label class="check-row"><input name="isActive" type="checkbox" checked> Show publicly</label>
+              <button class="button button-primary" type="submit">Save Activity</button>
+              <button class="button button-secondary js-reset-form" type="button">Clear</button>
+              <p class="form-status" role="status" aria-live="polite"></p>
+            </form>
+            <div class="admin-list" data-admin-list="activities"></div>
+          </div>
+        </section>
+
+        <section class="admin-pane" data-admin-pane="registrations">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Name</th><th>Phone</th><th>Activity</th><th>Participants</th><th>Notes</th><th>Created</th></tr>
+              </thead>
+              <tbody data-admin-table="registrations"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="admin-pane" data-admin-pane="products">
+          <div class="admin-grid">
+            <form class="form-panel js-product-admin-form" aria-labelledby="product-admin-title">
+              <h3 id="product-admin-title">Add or edit product</h3>
+              <input type="hidden" name="id">
+              <input type="hidden" name="imageKey">
+              <label for="admin-product-name">Name</label>
+              <input id="admin-product-name" name="name" type="text" required>
+              <label for="admin-product-description">Description</label>
+              <textarea id="admin-product-description" name="description" rows="4"></textarea>
+              <label for="admin-product-price">Price label</label>
+              <input id="admin-product-price" name="priceLabel" type="text" placeholder="Price: TBA">
+              <label for="admin-product-option-label">Option label</label>
+              <input id="admin-product-option-label" name="optionLabel" type="text" placeholder="Size / color">
+              <label for="admin-product-options">Options, one per line</label>
+              <textarea id="admin-product-options" name="options" rows="4" placeholder="Black / M&#10;White / L"></textarea>
+              <label for="admin-product-sort">Sort order</label>
+              <input id="admin-product-sort" name="sortOrder" type="number" value="0">
+              <label for="admin-product-image">Product image</label>
+              <input id="admin-product-image" name="image" type="file" accept="image/png,image/jpeg,image/webp,image/gif">
+              <p class="image-status" data-image-status>No image uploaded.</p>
+              <label class="check-row"><input name="isActive" type="checkbox" checked> Show publicly</label>
+              <button class="button button-primary" type="submit">Save Product</button>
+              <button class="button button-secondary js-reset-form" type="button">Clear</button>
+              <p class="form-status" role="status" aria-live="polite"></p>
+            </form>
+            <div class="admin-list" data-admin-list="products"></div>
+          </div>
+        </section>
+
+        <section class="admin-pane" data-admin-pane="bookings">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Name</th><th>Phone</th><th>Session</th><th>Preferred Date</th><th>Notes</th><th>Created</th></tr>
+              </thead>
+              <tbody data-admin-table="bookings"></tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-brand">
+      <img src="assets/kinetix-logo.svg" alt="" class="brand-mark">
+      <span>KINETIX</span>
+    </div>
+    <nav class="footer-links" aria-label="Footer navigation">
+      <a href="index.html">Home</a>
+      <a href="coaching.html">Coaching</a>
+      <a href="activities.html">Activities</a>
+      <a href="merch.html">Merch</a>
+      <a href="about.html">About / Contact</a>
+      <a href="admin.html">Admin</a>
+    </nav>
+  </footer>
+</body>
+</html>
