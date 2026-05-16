@@ -4,6 +4,7 @@ README.md
 package.json
 package-lock.json
 .gitignore
+assets/*.png
 node_modules
 node_modules/**
 worker.js
