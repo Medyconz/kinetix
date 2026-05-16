@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Coaching | Kinetix</title>
+  <meta name="description" content="Book Kinetix coaching sessions for personal fitness, sports performance, mobility, and youth athletic development.">
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+<body data-page="coaching">
+  <header class="site-header">
+    <nav class="navbar" aria-label="Main navigation">
+      <a class="brand" href="index.html" aria-label="Kinetix home">
+        <img src="assets/kinetix-logo.svg" alt="" class="brand-mark">
+        <span>KINETIX</span>
+      </a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">
+        <span class="sr-only">Toggle navigation</span>
+        <span></span>
+        <span></span>
+      </button>
+      <div class="nav-links" id="site-nav">
+        <a href="index.html" data-nav="home">Home</a>
+        <a href="coaching.html" data-nav="coaching">Coaching</a>
+        <a href="activities.html" data-nav="activities">Activities</a>
+        <a href="merch.html" data-nav="merch">Merch</a>
+        <a href="about.html" data-nav="about">About / Contact</a>
+        <a href="admin.html" data-nav="admin">Admin</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="page-hero">
+      <p class="eyebrow">Coaching</p>
+      <h1>Precise coaching for stronger movement.</h1>
+      <p>Choose a session path and send your preferred time. Kinetix will confirm availability directly.</p>
+    </section>
+
+    <section class="section split-section">
+      <div class="card-grid coaching-grid">
+        <article class="service-card">
+          <div>
+            <p class="card-meta">60 min</p>
+            <h2>Personal Fitness Coaching</h2>
+            <p>One-to-one strength, conditioning, and movement sessions shaped around your current level.</p>
+          </div>
+          <div class="card-footer">
+            <span>Price: TBA</span>
+            <button class="button button-small button-primary js-pick-session" type="button" data-session="Personal Fitness Coaching">Book Now</button>
+          </div>
+        </article>
+        <article class="service-card">
+          <div>
+            <p class="card-meta">75 min</p>
+            <h2>Sports Performance Coaching</h2>
+            <p>Speed, power, agility, and sport-specific conditioning for competitive performance.</p>
+          </div>
+          <div class="card-footer">
+            <span>Price: TBA</span>
+            <button class="button button-small button-primary js-pick-session" type="button" data-session="Sports Performance Coaching">Book Now</button>
+          </div>
+        </article>
+        <article class="service-card">
+          <div>
+            <p class="card-meta">45 min</p>
+            <h2>Mobility &amp; Body Mechanics</h2>
+            <p>Focused mechanics work for cleaner range, better control, and more confident movement.</p>
+          </div>
+          <div class="card-footer">
+            <span>Price: TBA</span>
+            <button class="button button-small button-primary js-pick-session" type="button" data-session="Mobility & Body Mechanics">Book Now</button>
+          </div>
+        </article>
+        <article class="service-card">
+          <div>
+            <p class="card-meta">60 min</p>
+            <h2>Youth Athletic Development</h2>
+            <p>Age-aware coaching for coordination, strength foundations, and smart athletic habits.</p>
+          </div>
+          <div class="card-footer">
+            <span>Price: TBA</span>
+            <button class="button button-small button-primary js-pick-session" type="button" data-session="Youth Athletic Development">Book Now</button>
+          </div>
+        </article>
+      </div>
+
+      <form class="form-panel js-form" aria-labelledby="booking-title">
+        <h2 id="booking-title">Book a coaching session</h2>
+        <label for="booking-name">Name</label>
+        <input id="booking-name" name="name" type="text" autocomplete="name" required>
+        <label for="booking-phone">Phone</label>
+        <input id="booking-phone" name="phone" type="tel" autocomplete="tel" required>
+        <label for="session-type">Session type</label>
+        <select id="session-type" name="sessionType" required>
+          <option value="">Select a session</option>
+          <option>Personal Fitness Coaching</option>
+          <option>Sports Performance Coaching</option>
+          <option>Mobility &amp; Body Mechanics</option>
+          <option>Youth Athletic Development</option>
+        </select>
+        <label for="preferred-date">Preferred date</label>
+        <input id="preferred-date" name="preferredDate" type="date" required>
+        <label for="booking-notes">Notes</label>
+        <textarea id="booking-notes" name="notes" rows="5" placeholder="Goals, injuries, sport, or preferred time"></textarea>
+        <button class="button button-primary" type="submit">Send Booking Request</button>
+        <p class="form-status" role="status" aria-live="polite"></p>
+      </form>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-brand">
+      <img src="assets/kinetix-logo.svg" alt="" class="brand-mark">
+      <span>KINETIX</span>
+    </div>
+    <nav class="footer-links" aria-label="Footer navigation">
+      <a href="index.html">Home</a>
+      <a href="coaching.html">Coaching</a>
+      <a href="activities.html">Activities</a>
+      <a href="merch.html">Merch</a>
+      <a href="about.html">About / Contact</a>
+      <a href="admin.html">Admin</a>
+    </nav>
+  </footer>
+</body>
+</html>
