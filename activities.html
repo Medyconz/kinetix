@@ -5,115 +5,27 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Activities | Kinetix</title>
   <meta name="description" content="Register for Kinetix small sports activities and movement events.">
+  <meta property="og:title" content="Kinetix Activities">
+  <meta property="og:description" content="Register for focused small-group sports activities and movement events.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="assets/kinetix-logo.svg">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="style.css">
   <script src="script.js" defer></script>
 </head>
 <body data-page="activities">
-  <header class="site-header">
-    <nav class="navbar" aria-label="Main navigation">
-      <a class="brand" href="index.html" aria-label="Kinetix home">
-        <img src="assets/kinetix-logo.svg" alt="" class="brand-mark">
-        <span>KINETIX</span>
-      </a>
-      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">
-        <span class="sr-only">Toggle navigation</span>
-        <span></span>
-        <span></span>
-      </button>
-      <div class="nav-links" id="site-nav">
-        <a href="index.html" data-nav="home">Home</a>
-        <a href="coaching.html" data-nav="coaching">Coaching</a>
-        <a href="activities.html" data-nav="activities">Activities</a>
-        <a href="merch.html" data-nav="merch">Merch</a>
-        <a href="about.html" data-nav="about">About / Contact</a>
-        <a href="admin.html" data-nav="admin">Admin</a>
-      </div>
-    </nav>
-  </header>
-
+  <header class="site-header"><nav class="navbar" aria-label="Main navigation"><a class="brand" href="index.html" aria-label="Kinetix home"><img src="assets/kinetix-logo.svg" alt="" class="brand-mark"><span>KINETIX</span></a><button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav"><span class="sr-only">Toggle navigation</span><span></span><span></span></button><div class="nav-links" id="site-nav"><a href="index.html" data-nav="home">Home</a><a href="coaching.html" data-nav="coaching">Coaching</a><a href="activities.html" data-nav="activities">Activities</a><a href="merch.html" data-nav="merch">Merch</a><a href="about.html" data-nav="about">About / Contact</a></div></nav></header>
   <main>
-    <section class="page-hero">
-      <p class="eyebrow">Activities</p>
-      <h1>Small sessions. Sharp intent.</h1>
-      <p>Register for focused sports activities built around skill, rhythm, movement quality, and community energy.</p>
-    </section>
-
+    <section class="page-hero"><p class="eyebrow">Activities</p><h1>Small sessions. Sharp intent.</h1><p>Register for focused sports activities built around skill, rhythm, movement quality, and community energy.</p></section>
     <section class="section split-section">
       <div class="activity-list" aria-label="Available activities">
-        <article class="activity-card">
-          <div>
-            <p class="card-meta">Friday, 24 May</p>
-            <h2>Speed &amp; Agility Circuit</h2>
-          </div>
-          <dl>
-            <div><dt>Time</dt><dd>6:00 PM</dd></div>
-            <div><dt>Location</dt><dd>Kinetix Field Zone</dd></div>
-            <div><dt>Age group</dt><dd>14+</dd></div>
-          </dl>
-          <button class="button button-small button-primary js-pick-activity" type="button" data-activity="Speed & Agility Circuit">Register</button>
-        </article>
-        <article class="activity-card">
-          <div>
-            <p class="card-meta">Saturday, 25 May</p>
-            <h2>Mobility Reset Workshop</h2>
-          </div>
-          <dl>
-            <div><dt>Time</dt><dd>10:00 AM</dd></div>
-            <div><dt>Location</dt><dd>Kinetix Studio</dd></div>
-            <div><dt>Age group</dt><dd>16+</dd></div>
-          </dl>
-          <button class="button button-small button-primary js-pick-activity" type="button" data-activity="Mobility Reset Workshop">Register</button>
-        </article>
-        <article class="activity-card">
-          <div>
-            <p class="card-meta">Monday, 27 May</p>
-            <h2>Youth Movement Lab</h2>
-          </div>
-          <dl>
-            <div><dt>Time</dt><dd>5:30 PM</dd></div>
-            <div><dt>Location</dt><dd>Community Court</dd></div>
-            <div><dt>Age group</dt><dd>9-13</dd></div>
-          </dl>
-          <button class="button button-small button-primary js-pick-activity" type="button" data-activity="Youth Movement Lab">Register</button>
-        </article>
+        <article class="activity-card"><div><p class="card-meta">Friday, 24 May</p><h2>Speed &amp; Agility Circuit</h2></div><dl><div><dt>Time</dt><dd>6:00 PM</dd></div><div><dt>Location</dt><dd>Kinetix Field Zone</dd></div><div><dt>Age group</dt><dd>14+</dd></div></dl><button class="button button-small button-primary js-pick-activity" type="button" data-activity="Speed & Agility Circuit">Register</button></article>
+        <article class="activity-card"><div><p class="card-meta">Saturday, 25 May</p><h2>Mobility Reset Workshop</h2></div><dl><div><dt>Time</dt><dd>10:00 AM</dd></div><div><dt>Location</dt><dd>Kinetix Studio</dd></div><div><dt>Age group</dt><dd>16+</dd></div></dl><button class="button button-small button-primary js-pick-activity" type="button" data-activity="Mobility Reset Workshop">Register</button></article>
+        <article class="activity-card"><div><p class="card-meta">Monday, 27 May</p><h2>Youth Movement Lab</h2></div><dl><div><dt>Time</dt><dd>5:30 PM</dd></div><div><dt>Location</dt><dd>Community Court</dd></div><div><dt>Age group</dt><dd>9-13</dd></div></dl><button class="button button-small button-primary js-pick-activity" type="button" data-activity="Youth Movement Lab">Register</button></article>
       </div>
-
-      <form class="form-panel js-form" aria-labelledby="registration-title">
-        <h2 id="registration-title">Register for an activity</h2>
-        <label for="activity-name">Name</label>
-        <input id="activity-name" name="name" type="text" autocomplete="name" required>
-        <label for="activity-phone">Phone</label>
-        <input id="activity-phone" name="phone" type="tel" autocomplete="tel" required>
-        <label for="activity-choice">Activity choice</label>
-        <select id="activity-choice" name="activityChoice" required>
-          <option value="">Select an activity</option>
-          <option>Speed &amp; Agility Circuit</option>
-          <option>Mobility Reset Workshop</option>
-          <option>Youth Movement Lab</option>
-        </select>
-        <label for="participants">Number of participants</label>
-        <input id="participants" name="participants" type="number" min="1" value="1" required>
-        <label for="activity-notes">Notes</label>
-        <textarea id="activity-notes" name="notes" rows="5" placeholder="Participant ages, experience level, or special notes"></textarea>
-        <button class="button button-primary" type="submit">Send Registration</button>
-        <p class="form-status" role="status" aria-live="polite"></p>
-      </form>
+      <form class="form-panel js-form" aria-labelledby="registration-title"><h2 id="registration-title">Register for an activity</h2><label for="activity-name">Name</label><input id="activity-name" name="name" type="text" autocomplete="name" required><label for="activity-phone">Phone</label><input id="activity-phone" name="phone" type="tel" autocomplete="tel" required><label for="activity-choice">Activity choice</label><select id="activity-choice" name="activityChoice" required><option value="">Select an activity</option><option>Speed &amp; Agility Circuit</option><option>Mobility Reset Workshop</option><option>Youth Movement Lab</option></select><label for="participants">Number of participants</label><input id="participants" name="participants" type="number" min="1" value="1" required><label for="activity-notes">Notes</label><textarea id="activity-notes" name="notes" rows="5" placeholder="Participant ages, experience level, or special notes"></textarea><button class="button button-primary" type="submit">Send Registration</button><p class="form-status" role="status" aria-live="polite"></p></form>
     </section>
   </main>
-
-  <footer class="site-footer">
-    <div class="footer-brand">
-      <img src="assets/kinetix-logo.svg" alt="" class="brand-mark">
-      <span>KINETIX</span>
-    </div>
-    <nav class="footer-links" aria-label="Footer navigation">
-      <a href="index.html">Home</a>
-      <a href="coaching.html">Coaching</a>
-      <a href="activities.html">Activities</a>
-      <a href="merch.html">Merch</a>
-      <a href="about.html">About / Contact</a>
-      <a href="admin.html">Admin</a>
-    </nav>
-  </footer>
+  <footer class="site-footer"><div class="footer-brand"><img src="assets/kinetix-logo.svg" alt="" class="brand-mark"><span>KINETIX</span></div><nav class="footer-links" aria-label="Footer navigation"><a href="index.html">Home</a><a href="coaching.html">Coaching</a><a href="activities.html">Activities</a><a href="merch.html">Merch</a><a href="about.html">About / Contact</a></nav></footer>
 </body>
 </html>
