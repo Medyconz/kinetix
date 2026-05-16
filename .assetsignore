@@ -1,0 +1,16 @@
+AGENTS.md
+BACKEND_SETUP.md
+README.md
+package.json
+package-lock.json
+.gitignore
+worker.js
+wrangler.toml
+.assetsignore
+seed.sql
+migrations
+migrations/**
+.git
+.git/**
+.wrangler
+.wrangler/**
