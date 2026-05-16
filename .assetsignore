@@ -4,6 +4,8 @@ README.md
 package.json
 package-lock.json
 .gitignore
+node_modules
+node_modules/**
 worker.js
 wrangler.toml
 .assetsignore
