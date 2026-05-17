@@ -4,29 +4,110 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin | Kinetix</title>
-  <meta name="description" content="Kinetix admin dashboard for activities, registrations, products, and product images.">
+  <meta name="description" content="Kinetix admin dashboard for activities, registrations, products, audit logs, backups, and settings.">
   <meta name="robots" content="noindex,nofollow">
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="style.css">
-  <script src="script.js" defer></script>
+  <link rel="stylesheet" href="admin.css">
+  <script src="admin.js" defer></script>
 </head>
-<body data-page="admin">
-  <header class="site-header"><nav class="navbar" aria-label="Main navigation"><a class="brand" href="index.html" aria-label="Kinetix home"><img src="assets/kinetix-logo.svg" alt="" class="brand-mark"><span>KINETIX</span></a><button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav"><span class="sr-only">Toggle navigation</span><span></span><span></span></button><div class="nav-links" id="site-nav"><a href="index.html" data-nav="home">Home</a><a href="coaching.html" data-nav="coaching">Coaching</a><a href="activities.html" data-nav="activities">Activities</a><a href="merch.html" data-nav="merch">Merch</a><a href="about.html" data-nav="about">About / Contact</a></div></nav></header>
-  <main>
-    <section class="page-hero admin-hero"><p class="eyebrow">Admin</p><h1>Control the Kinetix backend.</h1><p>Manage activities, registrations, product listings, and product images from one private dashboard.</p></section>
-    <section class="section admin-section">
-      <form class="form-panel admin-login js-admin-login" aria-labelledby="admin-login-title"><h2 id="admin-login-title">Admin login</h2><label for="admin-password">Password</label><input id="admin-password" name="password" type="password" autocomplete="current-password" required><button class="button button-primary" type="submit">Enter Dashboard</button><p class="form-status" role="status" aria-live="polite"></p></form>
-      <div class="admin-dashboard is-hidden" aria-live="polite">
-        <div class="admin-topline"><div><p class="eyebrow">Dashboard</p><h2>Content and registrations</h2></div><button class="button button-secondary js-admin-logout" type="button">Logout</button></div>
-        <div class="stat-grid"><div><span data-stat="activities">0</span><p>Activities</p></div><div><span data-stat="products">0</span><p>Products</p></div><div><span data-stat="registrations">0</span><p>Registrations</p></div><div><span data-stat="bookings">0</span><p>Bookings</p></div></div>
-        <div class="admin-tabs" role="tablist" aria-label="Admin sections"><button class="is-active" type="button" data-admin-tab="activities">Activities</button><button type="button" data-admin-tab="registrations">Registrations</button><button type="button" data-admin-tab="products">Products</button><button type="button" data-admin-tab="bookings">Bookings</button></div>
-        <section class="admin-pane is-active" data-admin-pane="activities"><div class="admin-grid"><form class="form-panel js-activity-admin-form" aria-labelledby="activity-admin-title"><h3 id="activity-admin-title">Add or edit activity</h3><input type="hidden" name="id"><label for="admin-activity-title">Title</label><input id="admin-activity-title" name="title" type="text" required><label for="admin-activity-date">Date</label><input id="admin-activity-date" name="date" type="date" required><label for="admin-activity-time">Time</label><input id="admin-activity-time" name="time" type="text" placeholder="6:00 PM" required><label for="admin-activity-location">Location</label><input id="admin-activity-location" name="location" type="text" required><label for="admin-activity-age">Age group</label><input id="admin-activity-age" name="ageGroup" type="text" required><label for="admin-activity-description">Description</label><textarea id="admin-activity-description" name="description" rows="4"></textarea><label class="check-row"><input name="isActive" type="checkbox" checked> Show publicly</label><button class="button button-primary" type="submit">Save Activity</button><button class="button button-secondary js-reset-form" type="button">Clear</button><p class="form-status" role="status" aria-live="polite"></p></form><div class="admin-list" data-admin-list="activities"></div></div></section>
-        <section class="admin-pane" data-admin-pane="registrations"><div class="admin-tools"><label for="registration-search">Search registrations</label><input id="registration-search" type="search" data-table-filter="registrations" placeholder="Name, phone, activity, notes"><button class="button button-secondary js-export-csv" type="button" data-export="registrations">Export CSV</button></div><div class="table-wrap"><table><thead><tr><th>Name</th><th>Phone</th><th>Activity</th><th>Participants</th><th>Notes</th><th>Created</th></tr></thead><tbody data-admin-table="registrations"></tbody></table></div></section>
-        <section class="admin-pane" data-admin-pane="products"><div class="admin-grid"><form class="form-panel js-product-admin-form" aria-labelledby="product-admin-title"><h3 id="product-admin-title">Add or edit product</h3><input type="hidden" name="id"><input type="hidden" name="imageKey"><label for="admin-product-name">Name</label><input id="admin-product-name" name="name" type="text" required><label for="admin-product-description">Description</label><textarea id="admin-product-description" name="description" rows="4"></textarea><label for="admin-product-price">Price label</label><input id="admin-product-price" name="priceLabel" type="text" placeholder="Contact for pricing"><label for="admin-product-option-label">Option label</label><input id="admin-product-option-label" name="optionLabel" type="text" placeholder="Size / color"><label for="admin-product-options">Options, one per line</label><textarea id="admin-product-options" name="options" rows="4" placeholder="Black / M&#10;White / L"></textarea><label for="admin-product-sort">Sort order</label><input id="admin-product-sort" name="sortOrder" type="number" value="0"><label for="admin-product-image">Product image</label><input id="admin-product-image" name="image" type="file" accept="image/png,image/jpeg,image/webp,image/gif"><img class="image-preview is-hidden" alt="Product preview" data-image-preview><p class="image-status" data-image-status>No image uploaded.</p><label class="check-row"><input name="isActive" type="checkbox" checked> Show publicly</label><button class="button button-primary" type="submit">Save Product</button><button class="button button-secondary js-reset-form" type="button">Clear</button><p class="form-status" role="status" aria-live="polite"></p></form><div class="admin-list" data-admin-list="products"></div></div></section>
-        <section class="admin-pane" data-admin-pane="bookings"><div class="admin-tools"><label for="booking-search">Search bookings</label><input id="booking-search" type="search" data-table-filter="bookings" placeholder="Name, phone, session, notes"><button class="button button-secondary js-export-csv" type="button" data-export="bookings">Export CSV</button></div><div class="table-wrap"><table><thead><tr><th>Name</th><th>Phone</th><th>Session</th><th>Preferred Date</th><th>Notes</th><th>Created</th></tr></thead><tbody data-admin-table="bookings"></tbody></table></div></section>
+<body class="admin-body" data-page="admin">
+  <main class="admin-auth-wrap" data-admin-auth>
+    <form class="admin-login-card" data-login-form aria-labelledby="admin-login-title">
+      <a class="admin-login-brand" href="index.html" aria-label="Kinetix public home">
+        <img src="assets/kinetix-logo.svg" alt="" class="brand-mark">
+        <span>KINETIX</span>
+      </a>
+      <p class="admin-kicker">Private operations</p>
+      <h1 id="admin-login-title">Sign in to admin.</h1>
+      <p>Manage content, registrations, products, exports, audit logs, and backup snapshots.</p>
+      <label for="admin-password">Admin password</label>
+      <input id="admin-password" name="password" type="password" autocomplete="current-password" required>
+      <button class="admin-button admin-button-primary" type="submit">Enter dashboard</button>
+      <p class="admin-status" role="status" aria-live="polite" data-login-status></p>
+    </form>
+  </main>
+
+  <div class="admin-app is-hidden" data-admin-app>
+    <aside class="admin-sidebar" data-admin-sidebar aria-label="Admin navigation">
+      <div class="admin-sidebar-head">
+        <a class="admin-brand" href="admin.html" aria-label="Kinetix admin overview"><img src="assets/kinetix-logo.svg" alt=""><span>KINETIX</span></a>
+        <button class="admin-icon-button admin-mobile-close" type="button" data-mobile-close aria-label="Close navigation">×</button>
+      </div>
+      <nav class="admin-nav" data-resource-nav></nav>
+    </aside>
+    <div class="admin-overlay" data-mobile-overlay></div>
+
+    <section class="admin-workspace">
+      <header class="admin-topbar">
+        <button class="admin-icon-button admin-mobile-open" type="button" data-mobile-open aria-label="Open navigation">☰</button>
+        <div class="admin-breadcrumbs" data-breadcrumbs>Admin / Overview</div>
+        <button class="admin-command-button" type="button" data-command-open><span>Search admin</span><kbd>Ctrl K</kbd></button>
+        <a class="admin-toplink" href="index.html" target="_blank" rel="noreferrer">Preview site</a>
+        <button class="admin-toplink" type="button" data-logout>Logout</button>
+      </header>
+
+      <div class="admin-main">
+        <section class="admin-page is-active" data-page-panel="overview">
+          <div class="admin-page-head"><p class="admin-kicker">Overview</p><h1>Operations dashboard</h1><p>Live status, quick actions, and configuration warnings for the Kinetix backend.</p></div>
+          <div class="admin-stat-grid" data-stats></div>
+          <div class="admin-two-col">
+            <section class="admin-panel"><div class="admin-panel-head"><h2>Needs attention</h2></div><div class="admin-stack" data-attention></div></section>
+            <section class="admin-panel"><div class="admin-panel-head"><h2>System warnings</h2></div><div class="admin-stack" data-warnings></div></section>
+          </div>
+        </section>
+
+        <section class="admin-page" data-page-panel="activities">
+          <div class="admin-page-head"><p class="admin-kicker">Operations</p><h1>Activities</h1><p>Create, edit, hide, and delete public activities.</p></div>
+          <div class="admin-grid">
+            <form class="admin-panel admin-form" data-activity-form><h2>Add or edit activity</h2><input type="hidden" name="id"><label>Title<input name="title" required></label><label>Date<input name="date" type="date" required></label><label>Time<input name="time" placeholder="6:00 PM" required></label><label>Location<input name="location" required></label><label>Age group<input name="ageGroup" required></label><label>Description<textarea name="description" rows="4"></textarea></label><label class="admin-check"><input name="isActive" type="checkbox" checked> Show publicly</label><div class="admin-action-row"><button class="admin-button admin-button-primary" type="submit">Save activity</button><button class="admin-button" type="button" data-reset-form>Clear</button></div><p class="admin-status" data-activity-status></p></form>
+            <section class="admin-panel"><div class="admin-panel-head"><h2>Activity list</h2></div><div class="admin-toolbar"><input type="search" data-filter="activities" placeholder="Search activities"><select data-filter-status="activities"><option value="all">All statuses</option><option value="active">Visible</option><option value="hidden">Hidden</option></select></div><div data-list="activities"></div></section>
+          </div>
+        </section>
+
+        <section class="admin-page" data-page-panel="registrations">
+          <div class="admin-page-head"><p class="admin-kicker">Operations</p><h1>Registrations</h1><p>Search, review, and export activity registrations.</p></div>
+          <section class="admin-panel"><div class="admin-panel-head"><h2>Registration database</h2><button class="admin-button" type="button" data-export="registrations">Export CSV</button></div><div class="admin-toolbar"><input type="search" data-filter="registrations" placeholder="Search name, phone, activity"><select data-per-page="registrations"><option>25</option><option>50</option><option>100</option></select></div><div data-table="registrations"></div><div class="admin-pagination" data-pagination="registrations"></div></section>
+        </section>
+
+        <section class="admin-page" data-page-panel="products">
+          <div class="admin-page-head"><p class="admin-kicker">Catalog</p><h1>Products</h1><p>Manage merch listings, options, visibility, sort order, and images.</p></div>
+          <div class="admin-grid">
+            <form class="admin-panel admin-form" data-product-form><h2>Add or edit product</h2><input type="hidden" name="id"><input type="hidden" name="imageKey"><label>Name<input name="name" required></label><label>Description<textarea name="description" rows="4"></textarea></label><label>Price label<input name="priceLabel" placeholder="Contact for pricing"></label><label>Option label<input name="optionLabel" placeholder="Size / color"></label><label>Options, one per line<textarea name="options" rows="4" placeholder="Black / M&#10;White / L"></textarea></label><label>Sort order<input name="sortOrder" type="number" value="0"></label><label>Product image<input name="image" type="file" accept="image/png,image/jpeg,image/webp,image/gif"></label><img class="admin-image-preview is-hidden" alt="Product preview" data-product-preview><p class="admin-muted" data-image-status>No image uploaded.</p><label class="admin-check"><input name="isActive" type="checkbox" checked> Show publicly</label><div class="admin-action-row"><button class="admin-button admin-button-primary" type="submit">Save product</button><button class="admin-button" type="button" data-reset-form>Clear</button></div><p class="admin-status" data-product-status></p></form>
+            <section class="admin-panel"><div class="admin-panel-head"><h2>Product list</h2></div><div class="admin-toolbar"><input type="search" data-filter="products" placeholder="Search products"><select data-filter-status="products"><option value="all">All statuses</option><option value="active">Visible</option><option value="hidden">Hidden</option></select></div><div data-list="products"></div></section>
+          </div>
+        </section>
+
+        <section class="admin-page" data-page-panel="bookings">
+          <div class="admin-page-head"><p class="admin-kicker">Operations</p><h1>Bookings</h1><p>Search, review, and export coaching booking requests.</p></div>
+          <section class="admin-panel"><div class="admin-panel-head"><h2>Booking database</h2><button class="admin-button" type="button" data-export="bookings">Export CSV</button></div><div class="admin-toolbar"><input type="search" data-filter="bookings" placeholder="Search name, phone, session"><select data-per-page="bookings"><option>25</option><option>50</option><option>100</option></select></div><div data-table="bookings"></div><div class="admin-pagination" data-pagination="bookings"></div></section>
+        </section>
+
+        <section class="admin-page" data-page-panel="audit">
+          <div class="admin-page-head"><p class="admin-kicker">Security</p><h1>Audit log</h1><p>Track admin actions, exports, content changes, and sensitive operations.</p></div>
+          <section class="admin-panel"><div class="admin-panel-head"><h2>Recent admin actions</h2><button class="admin-button" type="button" data-export="audit">Export CSV</button></div><div class="admin-toolbar"><input type="search" data-filter="audit" placeholder="Search action or entity"><select data-per-page="audit"><option>25</option><option>50</option><option>100</option></select></div><div data-table="audit"></div><div class="admin-pagination" data-pagination="audit"></div></section>
+        </section>
+
+        <section class="admin-page" data-page-panel="backup">
+          <div class="admin-page-head"><p class="admin-kicker">Owner tools</p><h1>Backup snapshot</h1><p>Export an owner-level JSON snapshot with a manifest and redacted sensitive values.</p></div>
+          <section class="admin-panel"><div class="admin-panel-head"><h2>Backup export</h2><button class="admin-button admin-button-primary" type="button" data-backup-export>Download snapshot</button></div><p class="admin-muted">Includes activities, products, registrations, bookings, settings, and audit logs. Secrets are not included.</p><div class="admin-stack" data-backup-manifest></div></section>
+        </section>
+
+        <section class="admin-page" data-page-panel="settings">
+          <div class="admin-page-head"><p class="admin-kicker">Settings</p><h1>Admin settings</h1><p>Review admin permissions, resource registry, storage status, and integration readiness.</p></div>
+          <div class="admin-two-col"><section class="admin-panel"><div class="admin-panel-head"><h2>Permissions</h2></div><div class="admin-permission-grid" data-permissions></div></section><section class="admin-panel"><div class="admin-panel-head"><h2>Integrations</h2></div><div class="admin-stack" data-integrations></div></section></div>
+        </section>
       </div>
     </section>
-  </main>
-  <footer class="site-footer"><div class="footer-brand"><img src="assets/kinetix-logo.svg" alt="" class="brand-mark"><span>KINETIX</span></div><nav class="footer-links" aria-label="Footer navigation"><a href="index.html">Home</a><a href="coaching.html">Coaching</a><a href="activities.html">Activities</a><a href="merch.html">Merch</a><a href="about.html">About / Contact</a></nav></footer>
+  </div>
+
+  <div class="admin-modal is-hidden" data-command-modal role="dialog" aria-modal="true" aria-labelledby="command-title">
+    <div class="admin-modal-backdrop" data-command-close></div>
+    <section class="admin-command-panel">
+      <div class="admin-panel-head"><h2 id="command-title">Command search</h2><button class="admin-icon-button" type="button" data-command-close aria-label="Close command search">×</button></div>
+      <input type="search" data-command-input placeholder="Search pages and actions">
+      <div class="admin-command-results" data-command-results></div>
+    </section>
+  </div>
 </body>
 </html>
