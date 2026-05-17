@@ -22,6 +22,7 @@
     navToggle.setAttribute("aria-expanded", String(isOpen));
   });
 
+  injectAdminAccess();
   injectSocialFloaters();
   bindPickers();
   bindPublicForms();
@@ -83,6 +84,19 @@
       link.textContent = "Admin";
       footerLinks.append(link);
     }
+  }
+
+  function injectAdminAccess() {
+    if (page === "admin" || document.querySelector(".admin-quick-access")) return;
+    const style = document.createElement("style");
+    style.textContent = `.admin-nav-link{border:1px solid oklch(13% .018 235);color:oklch(13% .018 235)!important;background:oklch(97% .012 78)}.admin-nav-link:hover,.admin-nav-link:focus-visible{background:oklch(13% .018 235)!important;color:oklch(98% .012 78)!important}.admin-quick-access{position:fixed;left:18px;bottom:18px;z-index:61;display:inline-flex;min-height:44px;align-items:center;justify-content:center;border:1px solid oklch(13% .018 235);background:oklch(13% .018 235/.94);color:oklch(98% .012 78);padding:0 16px;font-size:.76rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase;backdrop-filter:blur(14px);box-shadow:0 14px 34px oklch(13% .018 235/.14);transition:transform .2s cubic-bezier(.16,1,.3,1),background .2s cubic-bezier(.16,1,.3,1),color .2s cubic-bezier(.16,1,.3,1)}.admin-quick-access:hover,.admin-quick-access:focus-visible{transform:translateY(-3px);background:oklch(97% .012 78);color:oklch(13% .018 235)}@media(max-width:560px){.admin-quick-access{left:12px;bottom:66px;min-height:42px;padding:0 14px}}`;
+    document.head.append(style);
+    const link = document.createElement("a");
+    link.href = "admin.html";
+    link.className = "admin-quick-access";
+    link.setAttribute("aria-label", "Open Kinetix admin portal");
+    link.textContent = "Admin";
+    document.body.append(link);
   }
 
   function injectSocialFloaters() {
