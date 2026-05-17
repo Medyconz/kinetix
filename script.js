@@ -8,20 +8,10 @@
     { key: "tiktok", label: "TikTok", href: "https://www.tiktok.com/@kinetix" },
   ];
 
+  injectMobilePolish();
   ensureSharedLinks();
-
-  document.querySelectorAll("[data-nav]").forEach((link) => {
-    if (link.dataset.nav === page) {
-      link.classList.add("is-active");
-      link.setAttribute("aria-current", "page");
-    }
-  });
-
-  navToggle?.addEventListener("click", () => {
-    const isOpen = document.body.classList.toggle("nav-open");
-    navToggle.setAttribute("aria-expanded", String(isOpen));
-  });
-
+  markActiveNav();
+  bindNavToggle();
   injectAdminAccess();
   injectSocialFloaters();
   bindPickers();
@@ -37,72 +27,81 @@
   if (page === "activities") hydrateActivities();
   if (page === "merch") hydrateProducts();
 
+  function injectMobilePolish() {
+    if (document.querySelector("#kinetix-mobile-polish")) return;
+    const style = document.createElement("style");
+    style.id = "kinetix-mobile-polish";
+    style.textContent = `@media(max-width:560px){body{font-size:15px}.navbar,.site-footer,.page-hero,.section{width:min(var(--max),calc(100% - 28px))}.navbar{min-height:58px;gap:10px}.brand{gap:9px}.brand-mark{width:28px;height:28px}.brand span{font-size:.78rem;letter-spacing:.06em}.nav-toggle{width:38px;height:38px}.nav-toggle span:not(.sr-only){width:16px}.nav-links{inset:59px 14px auto 14px}.nav-links a{padding:13px 12px;font-size:.78rem}.home-hero{min-height:auto;padding:18px 16px 30px;gap:18px}.home-hero:before{height:58%;opacity:.75}.home-hero .eyebrow{max-width:26ch;margin-bottom:12px;font-size:.66rem;letter-spacing:.12em}.home-hero h1{max-width:9ch;margin-bottom:14px;font-size:clamp(2.75rem,13.2vw,4rem);line-height:.84}.home-hero .hero-text{font-size:.95rem;line-height:1.55}.home-hero .button-row{gap:8px;margin-top:18px}.button{min-height:44px;padding:12px 15px;font-size:.76rem}.home-hero .hero-emblem{width:min(52vw,210px);max-width:210px}.hero-emblem img{width:68%;height:68%}.home-hero .hero-strip{margin-top:14px}.home-hero .hero-strip span{padding:9px 6px;font-size:.66rem}.page-hero{padding:42px 0 34px}.page-hero h1{max-width:13ch;margin-bottom:16px;font-size:clamp(2.05rem,10.5vw,3.15rem);line-height:.92}.page-hero p{font-size:.96rem;line-height:1.55}h2{font-size:clamp(1.45rem,7.5vw,2.15rem)}.section{padding:40px 0}.section-heading{gap:12px;margin-bottom:24px}.feature-panel{min-height:210px;padding:20px}.panel-number{font-size:clamp(1.7rem,10vw,3rem)}.service-card,.activity-card,.product-card,.form-panel,.cart-panel,.contact-panel{padding:20px}.service-card{min-height:250px}.service-card h2,.activity-card h2,.product-card h2,.form-panel h2,.cart-panel h2,.contact-panel h2,.story-copy h2{font-size:clamp(1.12rem,6vw,1.55rem);line-height:1.06}.card-footer{gap:10px;padding-top:16px}.product-image{aspect-ratio:1.25;margin-bottom:18px}.product-image:before{inset:13px}.form-panel .button,.product-card .button{margin-top:18px}.coaches-hero{width:min(var(--max),calc(100% - 28px))!important;padding:44px 0 24px!important;gap:18px!important}.coaches-hero h1{max-width:10ch!important;margin-bottom:14px!important;font-size:clamp(2.2rem,11vw,3.4rem)!important;line-height:.9!important}.coaches-hero p{font-size:.96rem!important;line-height:1.55!important}.coach-hero-panel{min-height:220px!important;padding:20px!important}.coaches-grid,.coach-cta{width:min(var(--max),calc(100% - 28px))!important}.coach-card{min-height:auto!important}.coach-photo{min-height:220px!important}.coach-photo span{font-size:clamp(2.8rem,16vw,4.5rem)!important}.coach-copy{padding:20px!important;gap:22px!important}.coach-copy h2{font-size:clamp(1.65rem,8vw,2.4rem)!important;line-height:.94!important}.coach-stats{grid-template-columns:1fr 1fr 1fr!important}.coach-stats strong{font-size:1.05rem!important}.coach-stats small{font-size:.62rem!important}.coach-cta{padding:40px 0!important}.admin-quick-access{left:12px;bottom:64px;min-height:40px;padding:0 12px;font-size:.68rem}.social-floaters{right:12px;bottom:12px}.social-floaters a{width:40px;height:40px}}`;
+    document.head.append(style);
+  }
+
   function ensureSharedLinks() {
     const nav = document.querySelector("#site-nav");
     if (nav && !nav.querySelector('[data-nav="coaches"]')) {
-      const link = document.createElement("a");
-      link.href = "coaches.html";
-      link.dataset.nav = "coaches";
-      link.textContent = "Our Coaches";
+      const link = makeLink("coaches.html", "Our Coaches", "coaches");
       const coachingLink = nav.querySelector('[data-nav="coaching"]');
       const activitiesLink = nav.querySelector('[data-nav="activities"]');
-      if (coachingLink?.nextSibling) {
-        nav.insertBefore(link, coachingLink.nextSibling);
-      } else if (activitiesLink) {
-        nav.insertBefore(link, activitiesLink);
-      } else {
-        nav.append(link);
-      }
+      if (coachingLink?.nextSibling) nav.insertBefore(link, coachingLink.nextSibling);
+      else if (activitiesLink) nav.insertBefore(link, activitiesLink);
+      else nav.append(link);
     }
     if (nav && !nav.querySelector('[data-nav="admin"]')) {
-      const link = document.createElement("a");
-      link.href = "admin.html";
-      link.dataset.nav = "admin";
-      link.textContent = "Admin";
+      const link = makeLink("admin.html", "Admin", "admin");
       link.className = "admin-nav-link";
       nav.append(link);
     }
 
     const footerLinks = document.querySelector(".footer-links");
     if (footerLinks && !footerLinks.querySelector('a[href="coaches.html"]')) {
-      const link = document.createElement("a");
-      link.href = "coaches.html";
-      link.textContent = "Our Coaches";
+      const link = makeLink("coaches.html", "Our Coaches");
       const coachingLink = Array.from(footerLinks.querySelectorAll("a")).find((item) => item.getAttribute("href") === "coaching.html");
       const activitiesLink = Array.from(footerLinks.querySelectorAll("a")).find((item) => item.getAttribute("href") === "activities.html");
-      if (coachingLink?.nextSibling) {
-        footerLinks.insertBefore(link, coachingLink.nextSibling);
-      } else if (activitiesLink) {
-        footerLinks.insertBefore(link, activitiesLink);
-      } else {
-        footerLinks.append(link);
+      if (coachingLink?.nextSibling) footerLinks.insertBefore(link, coachingLink.nextSibling);
+      else if (activitiesLink) footerLinks.insertBefore(link, activitiesLink);
+      else footerLinks.append(link);
+    }
+    if (footerLinks && !footerLinks.querySelector('a[href="admin.html"]')) footerLinks.append(makeLink("admin.html", "Admin"));
+  }
+
+  function makeLink(href, text, navKey) {
+    const link = document.createElement("a");
+    link.href = href;
+    link.textContent = text;
+    if (navKey) link.dataset.nav = navKey;
+    return link;
+  }
+
+  function markActiveNav() {
+    document.querySelectorAll("[data-nav]").forEach((link) => {
+      if (link.dataset.nav === page) {
+        link.classList.add("is-active");
+        link.setAttribute("aria-current", "page");
       }
-    }
-    if (footerLinks && !footerLinks.querySelector('a[href="admin.html"]')) {
-      const link = document.createElement("a");
-      link.href = "admin.html";
-      link.textContent = "Admin";
-      footerLinks.append(link);
-    }
+    });
+  }
+
+  function bindNavToggle() {
+    navToggle?.addEventListener("click", () => {
+      const isOpen = document.body.classList.toggle("nav-open");
+      navToggle.setAttribute("aria-expanded", String(isOpen));
+    });
   }
 
   function injectAdminAccess() {
     if (page === "admin" || document.querySelector(".admin-quick-access")) return;
     const style = document.createElement("style");
-    style.textContent = `.admin-nav-link{border:1px solid oklch(13% .018 235);color:oklch(13% .018 235)!important;background:oklch(97% .012 78)}.admin-nav-link:hover,.admin-nav-link:focus-visible{background:oklch(13% .018 235)!important;color:oklch(98% .012 78)!important}.admin-quick-access{position:fixed;left:18px;bottom:18px;z-index:61;display:inline-flex;min-height:44px;align-items:center;justify-content:center;border:1px solid oklch(13% .018 235);background:oklch(13% .018 235/.94);color:oklch(98% .012 78);padding:0 16px;font-size:.76rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase;backdrop-filter:blur(14px);box-shadow:0 14px 34px oklch(13% .018 235/.14);transition:transform .2s cubic-bezier(.16,1,.3,1),background .2s cubic-bezier(.16,1,.3,1),color .2s cubic-bezier(.16,1,.3,1)}.admin-quick-access:hover,.admin-quick-access:focus-visible{transform:translateY(-3px);background:oklch(97% .012 78);color:oklch(13% .018 235)}@media(max-width:560px){.admin-quick-access{left:12px;bottom:66px;min-height:42px;padding:0 14px}}`;
+    style.textContent = `.admin-nav-link{border:1px solid oklch(13% .018 235);color:oklch(13% .018 235)!important;background:oklch(97% .012 78)}.admin-nav-link:hover,.admin-nav-link:focus-visible{background:oklch(13% .018 235)!important;color:oklch(98% .012 78)!important}.admin-quick-access{position:fixed;left:18px;bottom:18px;z-index:61;display:inline-flex;min-height:44px;align-items:center;justify-content:center;border:1px solid oklch(13% .018 235);background:oklch(13% .018 235/.94);color:oklch(98% .012 78);padding:0 16px;font-size:.76rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase;backdrop-filter:blur(14px);box-shadow:0 14px 34px oklch(13% .018 235/.14);transition:transform .2s cubic-bezier(.16,1,.3,1),background .2s cubic-bezier(.16,1,.3,1),color .2s cubic-bezier(.16,1,.3,1)}.admin-quick-access:hover,.admin-quick-access:focus-visible{transform:translateY(-3px);background:oklch(97% .012 78);color:oklch(13% .018 235)}`;
     document.head.append(style);
-    const link = document.createElement("a");
-    link.href = "admin.html";
+    const link = makeLink("admin.html", "Admin");
     link.className = "admin-quick-access";
     link.setAttribute("aria-label", "Open Kinetix admin portal");
-    link.textContent = "Admin";
     document.body.append(link);
   }
 
   function injectSocialFloaters() {
     if (page === "admin" || document.querySelector(".social-floaters")) return;
     const style = document.createElement("style");
-    style.textContent = `.social-floaters{position:fixed;right:18px;bottom:18px;z-index:60;display:grid;gap:8px}.social-floaters a{width:46px;height:46px;display:grid;place-items:center;border:1px solid oklch(80% .012 78);background:oklch(97% .012 78/.92);color:oklch(13% .018 235);backdrop-filter:blur(14px);box-shadow:0 14px 34px oklch(13% .018 235/.11);transition:transform .2s cubic-bezier(.16,1,.3,1),background .2s cubic-bezier(.16,1,.3,1),color .2s cubic-bezier(.16,1,.3,1)}.social-floaters a svg{width:20px;height:20px;display:block;fill:currentColor}.social-floaters a:hover,.social-floaters a:focus-visible{transform:translateY(-3px);background:oklch(13% .018 235);color:oklch(98% .012 78)}@media(max-width:560px){.social-floaters{right:12px;bottom:12px;grid-auto-flow:column}.social-floaters a{width:42px;height:42px}.social-floaters a svg{width:19px;height:19px}}`;
+    style.textContent = `.social-floaters{position:fixed;right:18px;bottom:18px;z-index:60;display:grid;gap:8px}.social-floaters a{width:46px;height:46px;display:grid;place-items:center;border:1px solid oklch(80% .012 78);background:oklch(97% .012 78/.92);color:oklch(13% .018 235);backdrop-filter:blur(14px);box-shadow:0 14px 34px oklch(13% .018 235/.11);transition:transform .2s cubic-bezier(.16,1,.3,1),background .2s cubic-bezier(.16,1,.3,1),color .2s cubic-bezier(.16,1,.3,1)}.social-floaters a svg{width:20px;height:20px;display:block;fill:currentColor}.social-floaters a:hover,.social-floaters a:focus-visible{transform:translateY(-3px);background:oklch(13% .018 235);color:oklch(98% .012 78)}@media(max-width:560px){.social-floaters{grid-auto-flow:column}.social-floaters a svg{width:18px;height:18px}}`;
     document.head.append(style);
     const nav = document.createElement("nav");
     nav.className = "social-floaters";
