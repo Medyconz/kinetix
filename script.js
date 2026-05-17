@@ -8,7 +8,7 @@
     { key: "tiktok", label: "TikTok", short: "TT", href: "https://www.tiktok.com/@kinetix" },
   ];
 
-  ensureCoachesLinks();
+  ensureSharedLinks();
 
   document.querySelectorAll("[data-nav]").forEach((link) => {
     if (link.dataset.nav === page) {
@@ -36,7 +36,7 @@
   if (page === "activities") hydrateActivities();
   if (page === "merch") hydrateProducts();
 
-  function ensureCoachesLinks() {
+  function ensureSharedLinks() {
     const nav = document.querySelector("#site-nav");
     if (nav && !nav.querySelector('[data-nav="coaches"]')) {
       const link = document.createElement("a");
@@ -53,6 +53,14 @@
         nav.append(link);
       }
     }
+    if (nav && !nav.querySelector('[data-nav="admin"]')) {
+      const link = document.createElement("a");
+      link.href = "admin.html";
+      link.dataset.nav = "admin";
+      link.textContent = "Admin";
+      link.className = "admin-nav-link";
+      nav.append(link);
+    }
 
     const footerLinks = document.querySelector(".footer-links");
     if (footerLinks && !footerLinks.querySelector('a[href="coaches.html"]')) {
@@ -68,6 +76,12 @@
       } else {
         footerLinks.append(link);
       }
+    }
+    if (footerLinks && !footerLinks.querySelector('a[href="admin.html"]')) {
+      const link = document.createElement("a");
+      link.href = "admin.html";
+      link.textContent = "Admin";
+      footerLinks.append(link);
     }
   }
 
