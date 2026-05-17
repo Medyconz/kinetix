@@ -1,13 +1,25 @@
 (() => {
+  const FALLBACK_RESOURCES = [
+    { key: "overview", href: "overview", label: "Overview", navGroup: "home", kind: "dashboard", searchKeywords: ["dashboard", "status", "warnings"] },
+    { key: "activities", href: "activities", label: "Activities", navGroup: "operations", kind: "collection", searchKeywords: ["events", "sessions"] },
+    { key: "registrations", href: "registrations", label: "Registrations", navGroup: "operations", kind: "collection", searchKeywords: ["participants"] },
+    { key: "products", href: "products", label: "Products", navGroup: "catalog", kind: "collection", searchKeywords: ["merch", "images"] },
+    { key: "bookings", href: "bookings", label: "Bookings", navGroup: "operations", kind: "collection", searchKeywords: ["coaching"] },
+    { key: "audit", href: "audit", label: "Audit log", navGroup: "security", kind: "report", searchKeywords: ["history"] },
+    { key: "backup", href: "backup", label: "Backup", navGroup: "security", kind: "workflow", searchKeywords: ["snapshot"] },
+    { key: "settings", href: "settings", label: "Settings", navGroup: "settings", kind: "settings", searchKeywords: ["configuration"] },
+  ];
   const state = {
     me: null,
-    resources: [],
+    resources: FALLBACK_RESOURCES,
     view: new URLSearchParams(location.search).get("view") || "overview",
     data: { activities: [], products: [], registrations: { rows: [], total: 0 }, bookings: { rows: [], total: 0 }, audit: { rows: [], total: 0 } },
     filters: { activities: "", products: "", registrations: "", bookings: "", audit: "" },
     status: { activities: "all", products: "all" },
     page: { registrations: 1, bookings: 1, audit: 1 },
     perPage: { registrations: 25, bookings: 25, audit: 25 },
+    summary: { activities: 0, products: 0, registrations: 0, bookings: 0 },
+    backup: { tables: [] },
   };
 
   const auth = document.querySelector("[data-admin-auth]");
@@ -44,12 +56,17 @@
 
   async function boot() {
     state.me = await api("/api/admin/me");
-    state.resources = state.me.resources || [];
+    state.resources = state.me.resources?.length ? state.me.resources : FALLBACK_RESOURCES;
     auth.classList.add("is-hidden");
     app.classList.remove("is-hidden");
     renderNav();
-    await loadAll();
     showView(state.view);
+    renderShellData();
+    try {
+      await loadAll();
+    } catch (error) {
+      renderBackendUnavailable(error);
+    }
     renderCommandResults("");
   }
 
@@ -70,6 +87,10 @@
     state.data.bookings = bookings;
     state.data.audit = audit;
     state.backup = backup;
+    renderShellData();
+  }
+
+  function renderShellData() {
     renderOverview();
     renderActivities();
     renderProducts();
@@ -78,6 +99,16 @@
     renderCollection("audit", ["action", "entityType", "entityId", "actor", "reason", "createdAt"]);
     renderSettings();
     renderBackup();
+  }
+
+  function renderBackendUnavailable(error) {
+    const message = error?.message || "Backend data is unavailable.";
+    state.me = state.me || {};
+    state.me.warnings = [
+      ...(state.me.warnings || []),
+      { title: "Backend data unavailable", body: `${message} The admin menu is still available, but live tables need D1/R2 bindings and migrations.` },
+    ];
+    renderShellData();
   }
 
   async function loadCollection(name) {
@@ -114,17 +145,15 @@
   }
 
   function renderOverview() {
-    const stats = [
-      ["activities", state.summary.activities], ["products", state.summary.products], ["registrations", state.summary.registrations], ["bookings", state.summary.bookings],
-    ];
-    document.querySelector("[data-stats]").innerHTML = stats.map(([label, count]) => `<div class="admin-stat"><span>${escapeHtml(count)}</span><p>${escapeHtml(label)}</p></div>`).join("");
+    const stats = [["activities", state.summary.activities], ["products", state.summary.products], ["registrations", state.summary.registrations], ["bookings", state.summary.bookings]];
+    document.querySelector("[data-stats]").innerHTML = stats.map(([label, count]) => `<div class="admin-stat"><span>${escapeHtml(count || 0)}</span><p>${escapeHtml(label)}</p></div>`).join("");
     const attention = [];
     if (Number(state.summary.registrations || 0) > 0) attention.push(["Registrations waiting", `${state.summary.registrations} activity registrations are in the database.`, "registrations"]);
     if (Number(state.summary.bookings || 0) > 0) attention.push(["Booking requests", `${state.summary.bookings} coaching requests need follow-up.`, "bookings"]);
     if (!state.data.products.some((item) => item.imageKey)) attention.push(["Product images", "Add product images so the merch page feels real.", "products"]);
     document.querySelector("[data-attention]").innerHTML = (attention.length ? attention : [["Nothing urgent", "No operational items need attention right now.", "overview"]]).map(([title, body, view]) => `<button class="admin-callout" type="button" data-jump="${view}"><strong>${escapeHtml(title)}</strong><p>${escapeHtml(body)}</p></button>`).join("");
     document.querySelectorAll("[data-jump]").forEach((button) => button.addEventListener("click", () => showView(button.dataset.jump)));
-    const warnings = state.me.warnings || [];
+    const warnings = state.me?.warnings || [];
     document.querySelector("[data-warnings]").innerHTML = warnings.length ? warnings.map((warning) => `<div class="admin-callout"><strong>${escapeHtml(warning.title)}</strong><p>${escapeHtml(warning.body)}</p></div>`).join("") : `<div class="admin-callout"><strong>System ready</strong><p>No configuration warnings reported.</p></div>`;
   }
 
@@ -172,119 +201,58 @@
 
   async function setPage(name, page) {
     state.page[name] = Math.max(1, page);
-    state.data[name] = await loadCollection(name);
-    renderCollection(name, name === "audit" ? ["action", "entityType", "entityId", "actor", "reason", "createdAt"] : name === "bookings" ? ["name", "phone", "sessionType", "preferredDate", "notes", "createdAt"] : ["name", "phone", "activityChoice", "participants", "notes", "createdAt"]);
+    try { state.data[name] = await loadCollection(name); } catch (error) { renderBackendUnavailable(error); }
+    renderCollection(name, collectionKeys(name));
   }
 
   function bindForms() {
     const activity = document.querySelector("[data-activity-form]");
-    activity?.addEventListener("submit", async (event) => {
-      event.preventDefault();
-      const data = Object.fromEntries(new FormData(activity).entries());
-      data.isActive = activity.elements.isActive.checked;
-      await saveEntity("activities", data, "[data-activity-status]");
-      activity.reset(); activity.elements.isActive.checked = true;
-    });
+    activity?.addEventListener("submit", async (event) => { event.preventDefault(); const data = Object.fromEntries(new FormData(activity).entries()); data.isActive = activity.elements.isActive.checked; await saveEntity("activities", data, "[data-activity-status]"); activity.reset(); activity.elements.isActive.checked = true; });
     const product = document.querySelector("[data-product-form]");
-    product?.addEventListener("submit", async (event) => {
-      event.preventDefault();
-      const image = product.elements.image.files[0];
-      if (image) {
-        const upload = new FormData(); upload.append("image", image);
-        const result = await api("/api/admin/products/image", { method: "POST", body: upload });
-        product.elements.imageKey.value = result.imageKey;
-      }
-      const data = Object.fromEntries(new FormData(product).entries());
-      data.options = String(data.options || "").split("\n").map((line) => line.trim()).filter(Boolean);
-      data.isActive = product.elements.isActive.checked;
-      delete data.image;
-      await saveEntity("products", data, "[data-product-status]");
-      product.reset(); product.elements.isActive.checked = true; clearProductPreview();
-    });
-    product?.elements.image?.addEventListener("change", () => {
-      const preview = document.querySelector("[data-product-preview]");
-      const image = product.elements.image.files[0];
-      if (!image) return clearProductPreview();
-      preview.src = URL.createObjectURL(image); preview.classList.remove("is-hidden"); setText("[data-image-status]", "Ready to upload.");
-    });
+    product?.addEventListener("submit", async (event) => { event.preventDefault(); const image = product.elements.image.files[0]; if (image) { const upload = new FormData(); upload.append("image", image); const result = await api("/api/admin/products/image", { method: "POST", body: upload }); product.elements.imageKey.value = result.imageKey; } const data = Object.fromEntries(new FormData(product).entries()); data.options = String(data.options || "").split("\n").map((line) => line.trim()).filter(Boolean); data.isActive = product.elements.isActive.checked; delete data.image; await saveEntity("products", data, "[data-product-status]"); product.reset(); product.elements.isActive.checked = true; clearProductPreview(); });
+    product?.elements.image?.addEventListener("change", () => { const preview = document.querySelector("[data-product-preview]"); const image = product.elements.image.files[0]; if (!image) return clearProductPreview(); preview.src = URL.createObjectURL(image); preview.classList.remove("is-hidden"); setText("[data-image-status]", "Ready to upload."); });
     document.querySelectorAll("[data-reset-form]").forEach((button) => button.addEventListener("click", () => { button.closest("form").reset(); clearProductPreview(); }));
   }
 
   async function saveEntity(entity, data, statusSelector) {
-    setText(statusSelector, "Saving...");
-    await api(`/api/admin/${entity}`, { method: "POST", body: JSON.stringify(data) });
-    setText(statusSelector, "Saved.");
-    if (entity === "activities") { state.data.activities = await api("/api/admin/activities"); renderActivities(); }
-    if (entity === "products") { state.data.products = await api("/api/admin/products"); renderProducts(); }
-    state.summary = await api("/api/admin/summary"); renderOverview();
+    try {
+      setText(statusSelector, "Saving...");
+      await api(`/api/admin/${entity}`, { method: "POST", body: JSON.stringify(data) });
+      setText(statusSelector, "Saved.");
+      if (entity === "activities") { state.data.activities = await api("/api/admin/activities"); renderActivities(); }
+      if (entity === "products") { state.data.products = await api("/api/admin/products"); renderProducts(); }
+      state.summary = await api("/api/admin/summary"); renderOverview();
+    } catch (error) { setText(statusSelector, error.message); }
   }
 
-  function fillActivityForm(item) {
-    const form = document.querySelector("[data-activity-form]"); if (!form || !item) return;
-    ["id", "title", "date", "time", "location", "ageGroup", "description"].forEach((key) => { form.elements[key].value = item[key] || ""; });
-    form.elements.isActive.checked = Boolean(item.isActive);
-    form.scrollIntoView({ behavior: "smooth", block: "start" });
-  }
-
-  function fillProductForm(item) {
-    const form = document.querySelector("[data-product-form]"); if (!form || !item) return;
-    ["id", "name", "description", "priceLabel", "optionLabel", "imageKey", "sortOrder"].forEach((key) => { form.elements[key].value = item[key] || ""; });
-    form.elements.options.value = (item.options || []).join("\n");
-    form.elements.isActive.checked = Boolean(item.isActive);
-    setText("[data-image-status]", item.imageKey ? `Current image: ${item.imageKey}` : "No image uploaded.");
-    form.scrollIntoView({ behavior: "smooth", block: "start" });
-  }
-
-  async function deleteActivity(id) { if (!confirm("Delete this activity?")) return; await api(`/api/admin/activities/${id}`, { method: "DELETE" }); state.data.activities = await api("/api/admin/activities"); renderActivities(); }
-  async function deleteProduct(id) { if (!confirm("Delete this product?")) return; await api(`/api/admin/products/${id}`, { method: "DELETE" }); state.data.products = await api("/api/admin/products"); renderProducts(); }
+  function fillActivityForm(item) { const form = document.querySelector("[data-activity-form]"); if (!form || !item) return; ["id", "title", "date", "time", "location", "ageGroup", "description"].forEach((key) => { form.elements[key].value = item[key] || ""; }); form.elements.isActive.checked = Boolean(item.isActive); form.scrollIntoView({ behavior: "smooth", block: "start" }); }
+  function fillProductForm(item) { const form = document.querySelector("[data-product-form]"); if (!form || !item) return; ["id", "name", "description", "priceLabel", "optionLabel", "imageKey", "sortOrder"].forEach((key) => { form.elements[key].value = item[key] || ""; }); form.elements.options.value = (item.options || []).join("\n"); form.elements.isActive.checked = Boolean(item.isActive); setText("[data-image-status]", item.imageKey ? `Current image: ${item.imageKey}` : "No image uploaded."); form.scrollIntoView({ behavior: "smooth", block: "start" }); }
+  async function deleteActivity(id) { if (!confirm("Delete this activity?")) return; try { await api(`/api/admin/activities/${id}`, { method: "DELETE" }); state.data.activities = await api("/api/admin/activities"); renderActivities(); } catch (error) { alert(error.message); } }
+  async function deleteProduct(id) { if (!confirm("Delete this product?")) return; try { await api(`/api/admin/products/${id}`, { method: "DELETE" }); state.data.products = await api("/api/admin/products"); renderProducts(); } catch (error) { alert(error.message); } }
 
   function bindTools() {
-    document.querySelectorAll("[data-filter]").forEach((input) => input.addEventListener("input", debounce(async () => {
-      const name = input.dataset.filter; state.filters[name] = input.value; state.page[name] = 1;
-      if (name === "activities") return renderActivities();
-      if (name === "products") return renderProducts();
-      state.data[name] = await loadCollection(name); renderCollection(name, collectionKeys(name));
-    }, 180)));
+    document.querySelectorAll("[data-filter]").forEach((input) => input.addEventListener("input", debounce(async () => { const name = input.dataset.filter; state.filters[name] = input.value; state.page[name] = 1; if (name === "activities") return renderActivities(); if (name === "products") return renderProducts(); try { state.data[name] = await loadCollection(name); } catch (error) { renderBackendUnavailable(error); } renderCollection(name, collectionKeys(name)); }, 180)));
     document.querySelectorAll("[data-filter-status]").forEach((select) => select.addEventListener("change", () => { state.status[select.dataset.filterStatus] = select.value; select.dataset.filterStatus === "activities" ? renderActivities() : renderProducts(); }));
-    document.querySelectorAll("[data-per-page]").forEach((select) => select.addEventListener("change", async () => { const name = select.dataset.perPage; state.perPage[name] = Number(select.value); state.page[name] = 1; state.data[name] = await loadCollection(name); renderCollection(name, collectionKeys(name)); }));
+    document.querySelectorAll("[data-per-page]").forEach((select) => select.addEventListener("change", async () => { const name = select.dataset.perPage; state.perPage[name] = Number(select.value); state.page[name] = 1; try { state.data[name] = await loadCollection(name); } catch (error) { renderBackendUnavailable(error); } renderCollection(name, collectionKeys(name)); }));
     document.querySelectorAll("[data-export]").forEach((button) => button.addEventListener("click", () => exportCsv(button.dataset.export)));
     document.querySelector("[data-backup-export]")?.addEventListener("click", () => location.href = "/api/admin/backup/export");
   }
 
-  function exportCsv(name) {
-    const q = encodeURIComponent(state.filters[name] || "");
-    const path = name === "audit" ? "audit-logs" : name;
-    location.href = `/api/admin/${path}/export?q=${q}`;
-  }
-
-  function renderSettings() {
-    document.querySelector("[data-permissions]").innerHTML = (state.me.permissions || []).map((key) => `<div class="admin-permission">${escapeHtml(key)}</div>`).join("");
-    document.querySelector("[data-integrations]").innerHTML = (state.me.integrations || []).map((item) => `<div class="admin-callout"><strong>${escapeHtml(item.label)}</strong><p>${escapeHtml(item.status)}</p></div>`).join("");
-  }
-
-  function renderBackup() {
-    const tables = state.backup?.tables || [];
-    document.querySelector("[data-backup-manifest]").innerHTML = tables.map((table) => `<div class="admin-callout"><strong>${escapeHtml(table.table)}</strong><p>${escapeHtml(table.domain)} / ${escapeHtml(table.note || "Included")}</p></div>`).join("") || `<div class="admin-callout"><strong>Manifest unavailable</strong><p>Enable D1 to generate a backup manifest.</p></div>`;
-  }
+  function exportCsv(name) { const q = encodeURIComponent(state.filters[name] || ""); const path = name === "audit" ? "audit-logs" : name; location.href = `/api/admin/${path}/export?q=${q}`; }
+  function renderSettings() { document.querySelector("[data-permissions]").innerHTML = (state.me?.permissions || []).map((key) => `<div class="admin-permission">${escapeHtml(key)}</div>`).join("") || `<div class="admin-callout"><strong>Permissions unavailable</strong><p>Sign in with active backend configuration to load permissions.</p></div>`; document.querySelector("[data-integrations]").innerHTML = (state.me?.integrations || []).map((item) => `<div class="admin-callout"><strong>${escapeHtml(item.label)}</strong><p>${escapeHtml(item.status)}</p></div>`).join("") || `<div class="admin-callout"><strong>Integration status unavailable</strong><p>Backend setup is still required.</p></div>`; }
+  function renderBackup() { const tables = state.backup?.tables || []; document.querySelector("[data-backup-manifest]").innerHTML = tables.map((table) => `<div class="admin-callout"><strong>${escapeHtml(table.table)}</strong><p>${escapeHtml(table.domain)} / ${escapeHtml(table.note || "Included")}</p></div>`).join("") || `<div class="admin-callout"><strong>Manifest unavailable</strong><p>Enable D1 to generate a backup manifest.</p></div>`; }
 
   function bindCommandPalette() {
-    const modal = document.querySelector("[data-command-modal]");
-    const input = document.querySelector("[data-command-input]");
-    document.querySelector("[data-command-open]")?.addEventListener("click", openCommand);
-    document.querySelectorAll("[data-command-close]").forEach((node) => node.addEventListener("click", closeCommand));
-    input?.addEventListener("input", () => renderCommandResults(input.value));
-    document.addEventListener("keydown", (event) => {
-      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") { event.preventDefault(); openCommand(); }
-      if (event.key === "Escape" && !modal.classList.contains("is-hidden")) closeCommand();
-    });
+    const modal = document.querySelector("[data-command-modal]"); const input = document.querySelector("[data-command-input]");
+    document.querySelector("[data-command-open]")?.addEventListener("click", openCommand); document.querySelectorAll("[data-command-close]").forEach((node) => node.addEventListener("click", closeCommand)); input?.addEventListener("input", () => renderCommandResults(input.value));
+    document.addEventListener("keydown", (event) => { if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") { event.preventDefault(); openCommand(); } if (event.key === "Escape" && !modal.classList.contains("is-hidden")) closeCommand(); });
     function openCommand() { modal.classList.remove("is-hidden"); setTimeout(() => input.focus(), 0); renderCommandResults(input.value || ""); }
     function closeCommand() { modal.classList.add("is-hidden"); document.querySelector("[data-command-open]")?.focus(); }
   }
 
   function renderCommandResults(term) {
     const search = String(term || "").toLowerCase();
-    const results = state.resources.flatMap((resource) => [resource, ...(resource.actions || []).map((action) => ({ ...action, parent: resource.label }))])
-      .filter((item) => [item.label, item.parent, ...(item.searchKeywords || [])].join(" ").toLowerCase().includes(search)).slice(0, 10);
+    const results = state.resources.flatMap((resource) => [resource, ...(resource.actions || []).map((action) => ({ ...action, parent: resource.label }))]).filter((item) => [item.label, item.parent, ...(item.searchKeywords || [])].join(" ").toLowerCase().includes(search)).slice(0, 10);
     document.querySelector("[data-command-results]").innerHTML = results.map((item) => `<button type="button" data-command-view="${escapeAttr(item.href || item.key)}"><span>${escapeHtml(item.label)}</span><small>${escapeHtml(item.parent || item.kind || "Page")}</small></button>`).join("") || `<div class="admin-callout"><strong>No results</strong><p>Try activities, products, export, backup, or audit.</p></div>`;
     document.querySelectorAll("[data-command-view]").forEach((button) => button.addEventListener("click", () => { showView(button.dataset.commandView.replace("#", "")); document.querySelector("[data-command-modal]").classList.add("is-hidden"); }));
   }
