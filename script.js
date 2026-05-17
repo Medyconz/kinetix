@@ -3,9 +3,9 @@
   const navToggle = document.querySelector(".nav-toggle");
   const cart = new Map();
   const SOCIAL_LINKS = [
-    { key: "instagram", label: "Instagram", short: "IG", href: "https://instagram.com/kinetix" },
-    { key: "whatsapp", label: "WhatsApp", short: "WA", href: "https://wa.me/000000000000" },
-    { key: "tiktok", label: "TikTok", short: "TT", href: "https://www.tiktok.com/@kinetix" },
+    { key: "instagram", label: "Instagram", href: "https://instagram.com/kinetix" },
+    { key: "whatsapp", label: "WhatsApp", href: "https://wa.me/000000000000" },
+    { key: "tiktok", label: "TikTok", href: "https://www.tiktok.com/@kinetix" },
   ];
 
   ensureSharedLinks();
@@ -102,13 +102,22 @@
   function injectSocialFloaters() {
     if (page === "admin" || document.querySelector(".social-floaters")) return;
     const style = document.createElement("style");
-    style.textContent = `.social-floaters{position:fixed;right:18px;bottom:18px;z-index:60;display:grid;gap:8px}.social-floaters a{width:46px;height:46px;display:grid;place-items:center;border:1px solid oklch(80% .012 78);background:oklch(97% .012 78/.92);color:oklch(13% .018 235);font-size:.72rem;font-weight:900;letter-spacing:.04em;backdrop-filter:blur(14px);box-shadow:0 14px 34px oklch(13% .018 235/.11);transition:transform .2s cubic-bezier(.16,1,.3,1),background .2s cubic-bezier(.16,1,.3,1),color .2s cubic-bezier(.16,1,.3,1)}.social-floaters a:hover,.social-floaters a:focus-visible{transform:translateY(-3px);background:oklch(13% .018 235);color:oklch(98% .012 78)}@media(max-width:560px){.social-floaters{right:12px;bottom:12px;grid-auto-flow:column}.social-floaters a{width:42px;height:42px}}`;
+    style.textContent = `.social-floaters{position:fixed;right:18px;bottom:18px;z-index:60;display:grid;gap:8px}.social-floaters a{width:46px;height:46px;display:grid;place-items:center;border:1px solid oklch(80% .012 78);background:oklch(97% .012 78/.92);color:oklch(13% .018 235);backdrop-filter:blur(14px);box-shadow:0 14px 34px oklch(13% .018 235/.11);transition:transform .2s cubic-bezier(.16,1,.3,1),background .2s cubic-bezier(.16,1,.3,1),color .2s cubic-bezier(.16,1,.3,1)}.social-floaters a svg{width:20px;height:20px;display:block;fill:currentColor}.social-floaters a:hover,.social-floaters a:focus-visible{transform:translateY(-3px);background:oklch(13% .018 235);color:oklch(98% .012 78)}@media(max-width:560px){.social-floaters{right:12px;bottom:12px;grid-auto-flow:column}.social-floaters a{width:42px;height:42px}.social-floaters a svg{width:19px;height:19px}}`;
     document.head.append(style);
     const nav = document.createElement("nav");
     nav.className = "social-floaters";
     nav.setAttribute("aria-label", "Social links");
-    nav.innerHTML = SOCIAL_LINKS.map((item) => `<a href="${escapeAttr(item.href)}" target="_blank" rel="noreferrer" aria-label="Open Kinetix ${escapeAttr(item.label)}">${escapeHtml(item.short)}</a>`).join("");
+    nav.innerHTML = SOCIAL_LINKS.map((item) => `<a href="${escapeAttr(item.href)}" target="_blank" rel="noreferrer" aria-label="Open Kinetix ${escapeAttr(item.label)}">${socialIcon(item.key)}<span class="sr-only">${escapeHtml(item.label)}</span></a>`).join("");
     document.body.append(nav);
+  }
+
+  function socialIcon(key) {
+    const icons = {
+      instagram: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.75 2h8.5A5.76 5.76 0 0 1 22 7.75v8.5A5.76 5.76 0 0 1 16.25 22h-8.5A5.76 5.76 0 0 1 2 16.25v-8.5A5.76 5.76 0 0 1 7.75 2Zm0 2A3.75 3.75 0 0 0 4 7.75v8.5A3.75 3.75 0 0 0 7.75 20h8.5A3.75 3.75 0 0 0 20 16.25v-8.5A3.75 3.75 0 0 0 16.25 4h-8.5ZM12 7.3A4.7 4.7 0 1 1 12 16.7 4.7 4.7 0 0 1 12 7.3Zm0 2A2.7 2.7 0 1 0 12 14.7 2.7 2.7 0 0 0 12 9.3Zm5.05-2.65a1.1 1.1 0 1 1-2.2 0 1.1 1.1 0 0 1 2.2 0Z"/></svg>',
+      whatsapp: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12.04 2a9.9 9.9 0 0 1 8.45 15.05L21.8 22l-5.08-1.28A9.91 9.91 0 0 1 2.13 12.1 9.92 9.92 0 0 1 12.04 2Zm0 2a7.91 7.91 0 0 0-6.78 11.96l.28.45-.73 2.74 2.83-.72.43.25A7.9 7.9 0 1 0 12.04 4Zm-3.1 3.77c.18-.02.38-.02.58-.01.14 0 .33.05.5.43.2.46.67 1.64.72 1.75.06.12.1.26.02.41-.08.16-.12.25-.24.39-.12.14-.25.31-.36.42-.12.12-.25.25-.11.49.14.24.62 1.02 1.33 1.65.92.82 1.69 1.07 1.93 1.2.24.12.38.1.53-.06.14-.17.6-.7.76-.94.16-.24.32-.2.54-.12.22.08 1.42.67 1.66.79.25.12.41.18.47.28.06.1.06.59-.14 1.15-.2.57-1.16 1.09-1.62 1.13-.42.04-.95.06-1.53-.1-.36-.1-.81-.26-1.39-.51-2.44-1.05-4.04-3.5-4.16-3.66-.12-.16-.99-1.31-.99-2.5 0-1.2.63-1.78.85-2.03.22-.24.49-.3.65-.32Z"/></svg>',
+      tiktok: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15.7 2c.32 2.2 1.55 3.7 3.8 3.84v3.05a7.01 7.01 0 0 1-3.78-1.12v6.76A6.13 6.13 0 1 1 9.6 8.4c.34 0 .67.03.98.08v3.32a2.91 2.91 0 1 0 1.96 2.75V2h3.16Z"/></svg>'
+    };
+    return icons[key] || "";
   }
 
   function bindPickers() {
