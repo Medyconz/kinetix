@@ -8,6 +8,8 @@
     { key: "tiktok", label: "TikTok", short: "TT", href: "https://www.tiktok.com/@kinetix" },
   ];
 
+  ensureCoachesLinks();
+
   document.querySelectorAll("[data-nav]").forEach((link) => {
     if (link.dataset.nav === page) {
       link.classList.add("is-active");
@@ -33,6 +35,41 @@
 
   if (page === "activities") hydrateActivities();
   if (page === "merch") hydrateProducts();
+
+  function ensureCoachesLinks() {
+    const nav = document.querySelector("#site-nav");
+    if (nav && !nav.querySelector('[data-nav="coaches"]')) {
+      const link = document.createElement("a");
+      link.href = "coaches.html";
+      link.dataset.nav = "coaches";
+      link.textContent = "Our Coaches";
+      const coachingLink = nav.querySelector('[data-nav="coaching"]');
+      const activitiesLink = nav.querySelector('[data-nav="activities"]');
+      if (coachingLink?.nextSibling) {
+        nav.insertBefore(link, coachingLink.nextSibling);
+      } else if (activitiesLink) {
+        nav.insertBefore(link, activitiesLink);
+      } else {
+        nav.append(link);
+      }
+    }
+
+    const footerLinks = document.querySelector(".footer-links");
+    if (footerLinks && !footerLinks.querySelector('a[href="coaches.html"]')) {
+      const link = document.createElement("a");
+      link.href = "coaches.html";
+      link.textContent = "Our Coaches";
+      const coachingLink = Array.from(footerLinks.querySelectorAll("a")).find((item) => item.getAttribute("href") === "coaching.html");
+      const activitiesLink = Array.from(footerLinks.querySelectorAll("a")).find((item) => item.getAttribute("href") === "activities.html");
+      if (coachingLink?.nextSibling) {
+        footerLinks.insertBefore(link, coachingLink.nextSibling);
+      } else if (activitiesLink) {
+        footerLinks.insertBefore(link, activitiesLink);
+      } else {
+        footerLinks.append(link);
+      }
+    }
+  }
 
   function injectSocialFloaters() {
     if (page === "admin" || document.querySelector(".social-floaters")) return;
