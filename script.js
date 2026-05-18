@@ -1,5 +1,5 @@
 (() => {
-  const page = document.body.dataset.page;
+  const page = document.body.dataset.page || "";
   const cart = new Map();
   const SOCIAL_LINKS = [
     { key: "instagram", label: "Instagram", href: "https://instagram.com/kinetix" },
@@ -7,7 +7,9 @@
     { key: "tiktok", label: "TikTok", href: "https://www.tiktok.com/@kinetix" },
   ];
 
-  loadEnhancements();
+  loadStylesheet("enhancements.css");
+  loadStylesheet("frontend-polish.css");
+  loadScript("frontend-polish.js");
   ensureSharedLinks();
   enhanceFooter();
   markActiveNav();
@@ -28,12 +30,20 @@
   if (page === "activities") hydrateActivities();
   if (page === "merch") hydrateProducts();
 
-  function loadEnhancements() {
-    if (document.querySelector('link[href="enhancements.css"]')) return;
+  function loadStylesheet(href) {
+    if (document.querySelector(`link[href="${href}"]`)) return;
     const link = document.createElement("link");
     link.rel = "stylesheet";
-    link.href = "enhancements.css";
+    link.href = href;
     document.head.append(link);
+  }
+
+  function loadScript(src) {
+    if (document.querySelector(`script[src="${src}"]`)) return;
+    const script = document.createElement("script");
+    script.src = src;
+    script.defer = true;
+    document.head.append(script);
   }
 
   function ensureSharedLinks() {
@@ -41,9 +51,7 @@
     if (nav && !nav.querySelector('[data-nav="coaches"]')) {
       const link = makeLink("coaches.html", "Our Coaches", "coaches");
       const coachingLink = nav.querySelector('[data-nav="coaching"]');
-      const activitiesLink = nav.querySelector('[data-nav="activities"]');
       if (coachingLink?.nextSibling) nav.insertBefore(link, coachingLink.nextSibling);
-      else if (activitiesLink) nav.insertBefore(link, activitiesLink);
       else nav.append(link);
     }
     if (nav && !nav.querySelector('[data-nav="admin"]')) {
@@ -51,16 +59,8 @@
       link.className = "admin-nav-link";
       nav.append(link);
     }
-
     const footerLinks = document.querySelector(".footer-links");
-    if (footerLinks && !footerLinks.querySelector('a[href="coaches.html"]')) {
-      const link = makeLink("coaches.html", "Our Coaches");
-      const coachingLink = Array.from(footerLinks.querySelectorAll("a")).find((item) => item.getAttribute("href") === "coaching.html");
-      const activitiesLink = Array.from(footerLinks.querySelectorAll("a")).find((item) => item.getAttribute("href") === "activities.html");
-      if (coachingLink?.nextSibling) footerLinks.insertBefore(link, coachingLink.nextSibling);
-      else if (activitiesLink) footerLinks.insertBefore(link, activitiesLink);
-      else footerLinks.append(link);
-    }
+    if (footerLinks && !footerLinks.querySelector('a[href="coaches.html"]')) footerLinks.append(makeLink("coaches.html", "Our Coaches"));
     if (footerLinks && !footerLinks.querySelector('a[href="admin.html"]')) footerLinks.append(makeLink("admin.html", "Admin"));
   }
 
@@ -96,12 +96,10 @@
       const isOpen = document.body.classList.toggle("nav-open");
       navToggle.setAttribute("aria-expanded", String(isOpen));
     });
-    document.querySelectorAll("#site-nav a").forEach((link) => {
-      link.addEventListener("click", () => {
-        document.body.classList.remove("nav-open");
-        navToggle?.setAttribute("aria-expanded", "false");
-      });
-    });
+    document.querySelectorAll("#site-nav a").forEach((link) => link.addEventListener("click", () => {
+      document.body.classList.remove("nav-open");
+      navToggle?.setAttribute("aria-expanded", "false");
+    }));
   }
 
   function injectAdminAccess() {
@@ -125,10 +123,7 @@
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const targets = document.querySelectorAll(".hero-copy,.hero-emblem,.section-heading,.feature-panel,.service-card,.activity-card,.product-card,.form-panel,.cart-panel,.contact-panel,.coach-card,.coach-hero-panel,.kinetic-lab-copy,.motion-board");
     const reveal = (node, index) => setTimeout(() => node.classList.add("is-revealed"), Math.min(index * 55, 420));
-    if (!("IntersectionObserver" in window)) {
-      targets.forEach(reveal);
-      return;
-    }
+    if (!("IntersectionObserver" in window)) { targets.forEach(reveal); return; }
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         if (!entry.isIntersecting) return;
@@ -175,7 +170,7 @@
           if (status) status.textContent = result.message || "Request received.";
           form.reset();
         } catch (error) {
-          if (status) status.textContent = `${error.message} The backend is not active yet. Please contact Kinetix directly.`;
+          if (status) status.textContent = `${error.message} Please contact Kinetix directly.`;
         } finally {
           submit?.removeAttribute("disabled");
         }
@@ -185,10 +180,7 @@
 
   async function api(path, options = {}) {
     const isFormData = options.body instanceof FormData;
-    const response = await fetch(path, {
-      ...options,
-      headers: isFormData ? { ...(options.headers || {}) } : { "content-type": "application/json", ...(options.headers || {}) },
-    });
+    const response = await fetch(path, { ...options, headers: isFormData ? { ...(options.headers || {}) } : { "content-type": "application/json", ...(options.headers || {}) } });
     const data = await response.json().catch(() => ({}));
     if (!response.ok) throw new Error(data.error || "Request failed.");
     return data;
@@ -215,6 +207,7 @@
       if (!products.length) return;
       grid.innerHTML = products.map(productCard).join("");
       bindCartButtons();
+      window.dispatchEvent(new CustomEvent("kinetix:products-hydrated"));
     } catch {}
   }
 
@@ -230,6 +223,8 @@
 
   function bindCartButtons() {
     document.querySelectorAll(".js-add-cart").forEach((button) => {
+      if (button.dataset.cartBound) return;
+      button.dataset.cartBound = "true";
       button.addEventListener("click", () => {
         const product = button.dataset.product;
         if (!product) return;
@@ -254,10 +249,7 @@
       const remove = document.createElement("button");
       remove.type = "button";
       remove.textContent = "Remove";
-      remove.addEventListener("click", () => {
-        quantity <= 1 ? cart.delete(product) : cart.set(product, quantity - 1);
-        renderCart();
-      });
+      remove.addEventListener("click", () => { quantity <= 1 ? cart.delete(product) : cart.set(product, quantity - 1); renderCart(); });
       line.append(remove);
       cartItems.append(line);
     });
